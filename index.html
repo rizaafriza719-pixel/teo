@@ -2,201 +2,179 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Monitoring Panel Surya</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monitoring Mesin - Simulasi</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Canvas Gauges -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-gauges@2.1.7/gauge.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #eee;
-      text-align: center;
-      padding: 20px;
+      background:#f5f5f5;
+      font-family:Arial, sans-serif;
+      padding:20px;
+      margin:0;
     }
-
+    h2 {
+      text-align:center;
+      color:#222;
+      margin-bottom:10px;
+    }
     .container {
-      max-width: 900px;
-      margin: auto;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:25px;
+      max-width:900px;
+      margin:auto;
     }
-
-    .gauges {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin-bottom: 40px;
+    .gauge-box {
+      background:#fff;
+      padding:15px;
+      border-radius:12px;
+      text-align:center;
+      box-shadow:0 3px 10px rgba(0,0,0,0.12);
     }
-
-    canvas {
-      max-width: 100%;
+    .chart-container {
+      width:90%;
+      max-width:900px;
+      background:#fff;
+      margin:25px auto;
+      padding:20px;
+      border-radius:12px;
+      box-shadow:0 3px 10px rgba(0,0,0,0.12);
     }
-
-    .chart-box {
-      background: #222;
-      padding: 20px;
-      border-radius: 10px;
-    }
-
   </style>
 </head>
-
 <body>
-  <div class="container">
 
-    <!-- GAUGE PANELS -->
-    <div class="gauges">
-      <canvas id="gaugeVoltage" width="200" height="200"></canvas>
-      <canvas id="gaugeCurrent" width="200" height="200"></canvas>
-      <canvas id="gaugePower" width="200" height="200"></canvas>
-      <canvas id="gaugeFrequency" width="200" height="200"></canvas>
-    </div>
+<h2>Monitoring Mesin (Simulasi)</h2>
+<h2>Tugas Elektronika Daya - 2024i</h2>
 
-    <!-- GRAPH BELOW GAUGES -->
-    <div class="chart-box">
-      <canvas id="lineChart"></canvas>
-    </div>
+<div class="container">
 
+  <!-- SUHU: Hijau -->
+  <div class="gauge-box">
+    <canvas id="gSuhu" data-type="radial-gauge"
+      data-width="220" data-height="220"
+      data-min-value="0" data-max-value="150"
+      data-major-ticks="0,25,50,75,100,125,150"
+      data-units="°C" data-title="Suhu Mesin"
+      data-value="0" data-color-value="#00c851"
+      data-glow="true"></canvas>
   </div>
 
-  <script>
-    // ---------------- GAUGES -----------------------
-    const gaugeVoltage = new RadialGauge({
-      renderTo: "gaugeVoltage",
-      width: 200,
-      height: 200,
-      units: "Volt",
-      minValue: 0,
-      maxValue: 300,
-      majorTicks: ["0","50","100","150","200","250","300"],
-      strokeTicks: true,
-      highlights: [],
-      colorPlate: "#222",
-      colorNumbers: "#fff",
-      needleType: "line",
-      animationDuration: 500,
-    }).draw();
+  <!-- TEGANGAN: Biru -->
+  <div class="gauge-box">
+    <canvas id="gVolt" data-type="radial-gauge"
+      data-width="220" data-height="220"
+      data-min-value="0" data-max-value="300"
+      data-major-ticks="0,50,100,150,200,250,300"
+      data-units="V" data-title="Tegangan Output"
+      data-value="0" data-color-value="#007bff"
+      data-glow="true"></canvas>
+  </div>
 
-    const gaugeCurrent = new RadialGauge({
-      renderTo: "gaugeCurrent",
-      width: 200,
-      height: 200,
-      units: "Ampere",
-      minValue: 0,
-      maxValue: 20,
-      majorTicks: ["0","5","10","15","20"],
-      strokeTicks: true,
-      colorPlate: "#222",
-      colorNumbers: "#fff",
-      needleType: "line",
-      animationDuration: 500,
-    }).draw();
+  <!-- RPM: Kuning -->
+  <div class="gauge-box">
+    <canvas id="gRPM" data-type="radial-gauge"
+      data-width="220" data-height="220"
+      data-min-value="0" data-max-value="6000"
+      data-major-ticks="0,1000,2000,3000,4000,5000,6000"
+      data-units="RPM" data-title="Putaran Mesin"
+      data-value="0" data-color-value="#fdd835"
+      data-glow="true"></canvas>
+  </div>
 
-    const gaugePower = new RadialGauge({
-      renderTo: "gaugePower",
-      width: 200,
-      height: 200,
-      units: "Watt",
-      minValue: 0,
-      maxValue: 5000,
-      majorTicks: ["0","1000","2000","3000","4000","5000"],
-      strokeTicks: true,
-      colorPlate: "#222",
-      colorNumbers: "#fff",
-      needleType: "line",
-      animationDuration: 500,
-    }).draw();
+</div>
 
-    const gaugeFrequency = new RadialGauge({
-      renderTo: "gaugeFrequency",
-      width: 200,
-      height: 200,
-      units: "Hz",
-      minValue: 0,
-      maxValue: 70,
-      majorTicks: ["0","10","20","30","40","50","60","70"],
-      strokeTicks: true,
-      colorPlate: "#222",
-      colorNumbers: "#fff",
-      needleType: "line",
-      animationDuration: 500,
-    }).draw();
+<!-- ================= GRAFIK ================= -->
+<div class="chart-container">
+  <canvas id="chartMonitor"></canvas>
+</div>
 
+<script>
+window.onload = () => {
+  setTimeout(() => {
+    const g = window.gauges;
+    const gSuhu = g[0];
+    const gVolt = g[1];
+    const gRPM  = g[2];
 
-    // ---------------- GRAPH -----------------------
-    const ctx = document.getElementById("lineChart").getContext("2d");
-    
-    const chartData = {
-      labels: [],
-      datasets: [
-        {
-          label: "Voltage (V)",
-          data: [],
-          borderWidth: 2,
-          borderColor: "rgb(0,150,255)",
-        },
-        {
-          label: "Current (A)",
-          data: [],
-          borderWidth: 2,
-          borderColor: "rgb(0,255,150)",
-        },
-        {
-          label: "Power (W)",
-          data: [],
-          borderWidth: 2,
-          borderColor: "rgb(255,200,0)",
-        },
-      ]
-    };
+    const ctx = document.getElementById('chartMonitor').getContext('2d');
 
-    const lineChart = new Chart(ctx, {
-      type: "line",
-      data: chartData,
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Suhu (°C)',
+            data: [],
+            borderWidth: 2,
+            borderColor: '#00c851',
+            backgroundColor: 'rgba(0,200,81,0.2)'
+          },
+          {
+            label: 'Tegangan (V)',
+            data: [],
+            borderWidth: 2,
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0,123,255,0.2)'
+          },
+          {
+            label: 'RPM',
+            data: [],
+            borderWidth: 2,
+            borderColor: '#fdd835',
+            backgroundColor: 'rgba(253,216,53,0.2)'
+          }
+        ]
+      },
       options: {
         responsive: true,
         animation: false,
         scales: {
-          y: { beginAtZero: true }
+          x: { title: { display: true, text: 'Waktu (s)' } },
+          y: { title: { display: true, text: 'Nilai' } }
         }
       }
     });
 
+    let time = 0;
 
-    // ---------------- SIMULATION -----------------------
-    function updateData() {
-      const vol = 210 + Math.random() * 20;
-      const cur = 3 + Math.random() * 1;
-      const pow = vol * cur;
-      const freq = 50; // tetap flat
+    setInterval(() => {
+      // Simulasi data
+      let suhu = 60 + Math.random()*50;
+      let volt = 180 + Math.random()*70;
+      let rpm  = 1000 + Math.random()*4000;
 
       // Update gauge
-      gaugeVoltage.value = vol;
-      gaugeCurrent.value = cur;
-      gaugePower.value = pow;
-      gaugeFrequency.value = freq;
+      gSuhu.value = suhu;
+      gVolt.value = volt;
+      gRPM.value  = rpm;
 
-      // Update chart
-      const now = new Date().toLocaleTimeString();
-      chartData.labels.push(now);
+      // Update grafik
+      chart.data.labels.push(time++ + 's');
+      chart.data.datasets[0].data.push(suhu);
+      chart.data.datasets[1].data.push(volt);
+      chart.data.datasets[2].data.push(rpm);
 
-      chartData.datasets[0].data.push(vol);
-      chartData.datasets[1].data.push(cur);
-      chartData.datasets[2].data.push(pow);
-
-      if (chartData.labels.length > 30) {
-        chartData.labels.shift();
-        chartData.datasets.forEach(ds => ds.data.shift());
+      if (chart.data.labels.length > 20) {
+        chart.data.labels.shift();
+        chart.data.datasets.forEach(d => d.data.shift());
       }
 
-      lineChart.update();
-    }
+      chart.update();
 
-    // Update tiap 1 detik
-    setInterval(updateData, 1000);
+    }, 1000);
 
-  </script>
+  },800);
+}
+</script>
 
 </body>
 </html>
