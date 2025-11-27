@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitoring Panel Surya</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-gauges@2.1.7/gauge.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .gauges {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    canvas {
+      max-width: 100%;
+    }
+
+    .chart-box {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- GAUGE PANELS -->
+    <div class="gauges">
+      <canvas id="gaugeVoltage" width="200" height="200"></canvas>
+      <canvas id="gaugeCurrent" width="200" height="200"></canvas>
+      <canvas id="gaugePower" width="200" height="200"></canvas>
+      <canvas id="gaugeFrequency" width="200" height="200"></canvas>
+    </div>
+
+    <!-- GRAPH BELOW GAUGES -->
+    <div class="chart-box">
+      <canvas id="lineChart"></canvas>
+    </div>
+
+  </div>
+
+  <script>
+    // ---------------- GAUGES -----------------------
+    const gaugeVoltage = new RadialGauge({
+      renderTo: "gaugeVoltage",
+      width: 200,
+      height: 200,
+      units: "Volt",
+      minValue: 0,
+      maxValue: 300,
+      majorTicks: ["0","50","100","150","200","250","300"],
+      strokeTicks: true,
+      highlights: [],
+      colorPlate: "#222",
+      colorNumbers: "#fff",
+      needleType: "line",
+      animationDuration: 500,
+    }).draw();
+
+    const gaugeCurrent = new RadialGauge({
+      renderTo: "gaugeCurrent",
+      width: 200,
+      height: 200,
+      units: "Ampere",
+      minValue: 0,
+      maxValue: 20,
+      majorTicks: ["0","5","10","15","20"],
+      strokeTicks: true,
+      colorPlate: "#222",
+      colorNumbers: "#fff",
+      needleType: "line",
+      animationDuration: 500,
+    }).draw();
+
+    const gaugePower = new RadialGauge({
+      renderTo: "gaugePower",
+      width: 200,
+      height: 200,
+      units: "Watt",
+      minValue: 0,
+      maxValue: 5000,
+      majorTicks: ["0","1000","2000","3000","4000","5000"],
+      strokeTicks: true,
+      colorPlate: "#222",
+      colorNumbers: "#fff",
+      needleType: "line",
+      animationDuration: 500,
+    }).draw();
+
+    const gaugeFrequency = new RadialGauge({
+      renderTo: "gaugeFrequency",
+      width: 200,
+      height: 200,
+      units: "Hz",
+      minValue: 0,
+      maxValue: 70,
+      majorTicks: ["0","10","20","30","40","50","60","70"],
+      strokeTicks: true,
+      colorPlate: "#222",
+      colorNumbers: "#fff",
+      needleType: "line",
+      animationDuration: 500,
+    }).draw();
+
+
+    // ---------------- GRAPH -----------------------
+    const ctx = document.getElementById("lineChart").getContext("2d");
+    
+    const chartData = {
+      labels: [],
+      datasets: [
+        {
+          label: "Voltage (V)",
+          data: [],
+          borderWidth: 2,
+          borderColor: "rgb(0,150,255)",
+        },
+        {
+          label: "Current (A)",
+          data: [],
+          borderWidth: 2,
+          borderColor: "rgb(0,255,150)",
+        },
+        {
+          label: "Power (W)",
+          data: [],
+          borderWidth: 2,
+          borderColor: "rgb(255,200,0)",
+        },
+      ]
+    };
+
+    const lineChart = new Chart(ctx, {
+      type: "line",
+      data: chartData,
+      options: {
+        responsive: true,
+        animation: false,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+
+    // ---------------- SIMULATION -----------------------
+    function updateData() {
+      const vol = 210 + Math.random() * 20;
+      const cur = 3 + Math.random() * 1;
+      const pow = vol * cur;
+      const freq = 50; // tetap flat
+
+      // Update gauge
+      gaugeVoltage.value = vol;
+      gaugeCurrent.value = cur;
+      gaugePower.value = pow;
+      gaugeFrequency.value = freq;
+
+      // Update chart
+      const now = new Date().toLocaleTimeString();
+      chartData.labels.push(now);
+
+      chartData.datasets[0].data.push(vol);
+      chartData.datasets[1].data.push(cur);
+      chartData.datasets[2].data.push(pow);
+
+      if (chartData.labels.length > 30) {
+        chartData.labels.shift();
+        chartData.datasets.forEach(ds => ds.data.shift());
+      }
+
+      lineChart.update();
+    }
+
+    // Update tiap 1 detik
+    setInterval(updateData, 1000);
+
+  </script>
+
+</body>
+</html>
